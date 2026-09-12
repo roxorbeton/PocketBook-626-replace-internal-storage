@@ -1,9 +1,9 @@
 # PocketBook 626 replace internal storage
-Guide/general information about replacing internal storage in the ebook reader PocketBook 626 and other PocketBook devices
-Since i didn't see a definitive guide that worked, i've decided to make one myself, so others won't have to go throught hours of torture like me.
+Guide/general information about replacing internal storage in the ebook reader PocketBook 626 and other PocketBook devices.
+Since i didn't see a definitive guide that worked, i've decided to make one myself, so others won't have to go through hours of torture like me.
 The credits go to users on the mobileread.com forum, mainly _nhedgehog_,_m4mmon_ and others.
 
->I've separated guides to do certain tasks with the actual methods, so it's shorter.
+>I've separated guides to do certain tasks with the actual methods, so it's shorter
 
 ## Sources
 - [mobileread thread](https://www.mobileread.com/forums/showthread.php?t=278728)
@@ -14,13 +14,13 @@ The credits go to users on the mobileread.com forum, mainly _nhedgehog_,_m4mmon_
 ## About the device
 
 ### Hardware
-- PocketBook 626, and probably most of the other models except the very old ones use a micro SD card for internal storage (don't confuse it with the additional storage, that is also a micro SD card
+- PocketBook 626, and probably most of the other models, except the very old ones, use a micro SD card for internal storage (don't confuse it with the additional storage, that is also a micro SD card
   - As everyone knows, SD cards don't really live that long, and over time, they often die or become read-only. That means it deletes all the stuff you saved after shutting down the reader
 
 ### OS
-- The device uses linux with very unstandard configuration to make our lives harder
-- It has 10 partitions that look like this
-  - _p1_ is the _main/user data_ parition where books and apps are stored, it's also the parition that shows up when you connect the reader to a PC
+- The device uses linux with a weird configuration to make our lives harder
+- It has 10 partitions that look like this:
+  - _p1_ is the _main/user data_ partition where books and apps are stored, it's also the partition that shows up when you connect the reader to a PC
 ```
 Device          Boot   Start      End  Sectors   Size Id Type
 /dev/mmcblk0p1       1011712 31116287 30104576  14,4G  b W95 FAT32
@@ -33,31 +33,31 @@ Device          Boot   Start      End  Sectors   Size Id Type
 /dev/mmcblk0p9        776192   976895   200704    98M 83 Linux
 /dev/mmcblk0p10       976896  1009663    32768    16M 83 Linux
 ```
-- The system checks serial number of the SD card, to check if the card is the original one, other systems also do this (GPS devices, kiosks, etc.)
+- The system checks serial number of the SD card, to check if the card is the original one, other embedded systems also do this (GPS devices, kiosks, etc.)
   - So just cloning the whole image to another SD card won't work, if the CID does not match the original one, the reader just shows a sand clock at boot (or another error)
 
 ## What you need
-- A computer, preferably with Linux. If you insist on using Windows, well, good luck
+- A computer, i did it on Linux
 - Computer with internal SD card reader, or alternatively rooted android device with SD card slot
 - Working micro SD card that is the same size or bigger than the original
 
 ## Guides
 
 ### Read CID (Card Identification Data) of an SD card
-- Be aware that in order to correctly interact with a SD card, you need a device with embedded card reader. **USB readers can't read the cid**, since the computer sees the device as unspecified USB mass storage device
+- Be aware that in order to correctly interact with an SD card, you need a device with embedded card reader. **USB readers can't read the cid**, since the computer sees the device as unspecified USB mass storage device
 - It's easiest to do in Linux - `cat /sys/block/mmcblkX/device/cid` - replace X with the correct number (you can check with `lsblk`)
 - On Windows, you'll have to use specialized apps, i don't have experience with that, so you'll have to find something yourself
 - It's also possible to do in rooted android - You'll have to identify the correct disk number, most probably it's 1 because 0 is device storage
-  - To execute the command either download an Android terminal emulator app or use [adb](https://developer.android.com/tools/adb)
+  - To execute the command either download an Android terminal emulator app or use [adb](https://developer.android.com/tools/adb).
     - **How to do it with adb:** `adb shell`, `su`,`/sys/block/mmcblkX/device/cid`
 
 ### Read serial number of an SD card
 - Read the serial in linux - `cat /sys/block/mmcblkX/device/serial`
 - The SD_prepare app used in [this](#for-older-firmware-versions-edit-monitorapp) method also returns the serial number of card that's in the reader
-You can also derive the cards SN from its CID
+You can also derive the cards SN from its CID:
 - CID look like this `824a544e4361726410c708e2ef00e801`
 - Its SN looks like this `0xc708e2ef`
-- By comparing the old CID with the new CID, you can derive the new correct serial like this
+- By comparing the old CID with the new CID, you can derive the new correct serial like this:
 ```
                    c708e2ef
 824a544e4361726410 c708e2ef 00e801
@@ -66,16 +66,16 @@ You can also derive the cards SN from its CID
 - So the other serial will be `0x1286ddca`
 
 ### Create and write an image of the disk
-- I've used `dd` for simplicity, and also because i'm lazy so i just copied what others did
+- I've used `dd` for simplicity
 - There's loads of alternatives for both Linux and Windows (like Win32DiskImager)
 Create image - `dd if=/dev/mmcblkX of=/path/to/pocketbook_image.dd bs=512 conv=noerror,sync status=progress`
 Write image - `dd if=/path/to/pocketbook_image.dd of=/dev/mmcblkX bs=512 conv=noerror,sync status=progress`
 
 ### Make the main partition larger
 - Filesystem type is FAT32
-- In order to do that, the partition has to be deleted and recreated, so **backup all contents of the parition** so you can later put them into the new partition
+- In order to do that, the partition has to be deleted and recreated, so **backup all contents of the partition** so you can later put them into the new partition
 - Also, in my case. After booting up the reader with the resized partition, the device went into update mode. After the update, i couldn't open any of the books because of DRM protection. Those books were previously fine, others haven't reported anything like that
-- I've used fdisk, since fdisk is the goat
+- I've used fdisk:
 ```
  ~ $ sudo fdisk /dev/mmcblk0
 
@@ -161,7 +161,7 @@ Synching disks.
 
 ### Easiest method: Buy unlocked micro SD card
 - This method is obviously firmware independent since you won't be altering the system
-- Look up _unlocked CID micro SD_ or _custom CID micro SD_ or something along those lines. They are also sometimes called _coldcards_, mainly chinese sellers will pop up, but i've found a rather reliable seller from Europe - [zelemar.eu](https://zelemar.eu/)
+- Look up _unlocked CID micro SD_ or _custom CID micro SD_ or something along those lines. They are also sometimes called _coldcards_, mainly chinese sellers will pop up, but i've found a legit seller from Europe - [zelemar.eu](https://zelemar.eu/)
 - You can either buy card that will already ship to you with with your custom CID, or the CID can be changed with some software they provide
 - When you have the new working card, just [write the image to it](#Create-and-write-an-image-of-the-disk) and you're good to go
 
